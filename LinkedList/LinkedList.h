@@ -21,38 +21,6 @@ public:
 	Node<T>* Prev() const { return _prev; };
 
 	void SetValue(const T& value) { _value = value; };
-	
-	bool operator==(const Node<T>& other) const { return _value == other._value; }
-
-	bool operator!=(const Node<T>& other) const { return !(*this == other); }
-
-	Node<T>* operator++() const
-	{
-		return _next;
-	}
-
-	Node<T>* operator++(int) const
-	{
-		auto temp = this;
-
-		this++;
-
-		return temp;
-	}
-
-	Node<T>* operator--() const
-	{
-		return _prev;
-	}
-
-	Node<T>* operator--(int) const
-	{
-		auto temp = this;
-
-		this--;
-
-		return temp;
-	}
 };
 
 template <typename T>
@@ -68,7 +36,7 @@ class LinkedList
 
 		while (current)
 		{
-			if (*current == node)	return current;
+			if (current->Value() == node.Value())	return current;
 
 			current = current->Next();
 		}
@@ -91,13 +59,12 @@ class LinkedList
 	}
 
 public:
-
 	class Iterator
 	{
 		Node<T>* _current;
 		
 	public:
-		Iterator(const Node<T>& begin) : _current(&begin) {};
+		Iterator(Node<T>* begin) : _current(begin) {};
 
 		bool operator==(const Iterator& other) const { return _current == other._current; }
 
@@ -107,22 +74,82 @@ public:
 
 		Iterator& operator++()
 		{
-			return Iterator(_current++);
+			if (!_current) return *this;
+
+			_current = _current->Next();
+
+			return *this;
 		}
 
 		Iterator operator++(int)
 		{
-			return Iterator(++_current);
+			if (!_current) return *this;
+
+			auto temp = *this;
+
+			_current = _current->Next();
+
+			return temp;
 		}
 
 		Iterator& operator--()
 		{
-			return Iterator(_current--);
+			if (!_current) return *this;
+
+			_current = _current->Prev();
+
+			return *this;
 		}
 
 		Iterator operator--(int)
 		{
-			return Iterator(--_current);
+			if (!_current) return *this;
+
+			auto temp = *this;
+
+			_current = _current->Prev();
+
+			return temp;
+		}
+
+		Iterator operator+(int index) const
+		{
+			if (index < 0 || index >= _len) return *this;
+
+			auto temp = _current;
+
+			for (size_t i = 0; i < index && temp; i++)
+			{
+				temp = temp->Next();
+			}
+
+			return Iterator(temp);
+		}
+
+		Iterator& operator+=(int index)
+		{
+			*this = *this + index;
+
+			return *this;
+		}
+
+		Iterator operator-(int index) const
+		{
+			auto temp = _current;
+
+			for (size_t i = 0; i < index && temp; i++)
+			{
+				temp = temp->Prev();
+			}
+
+			return Iterator(temp);
+		}
+
+		Iterator& operator-=(int index)
+		{
+			*this = *this - index;
+
+			return *this;
 		}
 	};
 
@@ -133,7 +160,7 @@ public:
 
 	Iterator end()
 	{
-		return Iterator(_tail);
+		return Iterator(_tail->Next());
 	}
 
 	LinkedList() : _head{ nullptr }, _tail{ nullptr }, _len(0) {};
