@@ -16,14 +16,43 @@ public:
 
 	T Value() const { return _value; }
 
-	Node<T>* Next() const { return _next; };
+	Node<T>* Next() const { return _next; }; 
 
 	Node<T>* Prev() const { return _prev; };
 
 	void SetValue(const T& value) { _value = value; };
-	template <typename> class LinkedList;
+	
+	bool operator==(const Node<T>& other) const { return _value == other._value; }
 
-	friend class LinkedList<T>;
+	bool operator!=(const Node<T>& other) const { return !(*this == other); }
+
+	Node<T>* operator++() const
+	{
+		return _next;
+	}
+
+	Node<T>* operator++(int) const
+	{
+		auto temp = this;
+
+		this++;
+
+		return temp;
+	}
+
+	Node<T>* operator--() const
+	{
+		return _prev;
+	}
+
+	Node<T>* operator--(int) const
+	{
+		auto temp = this;
+
+		this--;
+
+		return temp;
+	}
 };
 
 template <typename T>
@@ -39,7 +68,7 @@ class LinkedList
 
 		while (current)
 		{
-			if (current->Value() == node.Value())	return current;
+			if (*current == node)	return current;
 
 			current = current->Next();
 		}
@@ -62,6 +91,50 @@ class LinkedList
 	}
 
 public:
+
+	class Iterator
+	{
+		Node<T>* _current;
+		
+	public:
+		Iterator(const Node<T>& begin) : _current(&begin) {};
+
+		bool operator==(const Iterator& other) const { return _current == other._current; }
+
+		bool operator!=(const Iterator& other) const { return _current != other._current; }
+
+		Node<T>& operator*() const { return *_current; }
+
+		Iterator& operator++()
+		{
+			return Iterator(_current++);
+		}
+
+		Iterator operator++(int)
+		{
+			return Iterator(++_current);
+		}
+
+		Iterator& operator--()
+		{
+			return Iterator(_current--);
+		}
+
+		Iterator operator--(int)
+		{
+			return Iterator(--_current);
+		}
+	};
+
+	Iterator begin()
+	{
+		return Iterator(_head);
+	}
+
+	Iterator end()
+	{
+		return Iterator(_tail);
+	}
 
 	LinkedList() : _head{ nullptr }, _tail{ nullptr }, _len(0) {};
 
