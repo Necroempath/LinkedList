@@ -114,8 +114,6 @@ public:
 
 		Iterator operator+(int index) const
 		{
-			if (index < 0 || index >= _len) return *this;
-
 			auto temp = _current;
 
 			for (size_t i = 0; i < index && temp; i++)
